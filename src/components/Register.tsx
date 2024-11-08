@@ -17,13 +17,35 @@ import logo from "../assets/quicklist-logo.png";
 import bg1 from "../assets/login-bg-1.png";
 import bg2 from "../assets/login-bg-2.png";
 import Footer from "./Footer";
+import type { User } from "@supabase/supabase-js";
+import { supabase } from "@/utils/supabaseClient";
+import { useUserContext } from "@/context/userContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { setUser } = useUserContext();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle registration logic here
+    // Handle login logic here
+
+    const result = await supabase.auth.signUp({ email, password });
+    if (result.error) {
+      alert(result.error.message);
+    } else {
+      setUser(result.data.user);
+      console.log(result);
+      alert("You have successfully registered to Quicklist");
+      navigate("/login", {
+        state: {
+          message: "Kayıt başarılı! Lütfen e-posta adresinizi onaylayın.",
+        },
+      });
+    }
   };
 
   const footerLinks = {
@@ -128,7 +150,14 @@ export default function Register() {
                 <label htmlFor="email" className="text-sm font-medium">
                   Email <span className="text-destructive">*</span>
                 </label>
-                <Input id="email" type="email" required className="w-full" />
+                <Input
+                  id="email"
+                  type="email"
+                  required
+                  className="w-full"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <label htmlFor="password" className="text-sm font-medium">
@@ -140,6 +169,8 @@ export default function Register() {
                     type={showPassword ? "text" : "password"}
                     required
                     className="w-full pr-10"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                   <Button
                     type="button"
@@ -168,11 +199,11 @@ export default function Register() {
                 <div className="mt-2 text-xs text-muted-foreground flex items-center justify-between">
                   <span>reCAPTCHA</span>
                   <div className="flex gap-2">
-                    <Link href="/privacy" className="hover:underline">
+                    <Link to="/privacy" className="hover:underline">
                       Privacy
                     </Link>
                     -
-                    <Link href="/terms" className="hover:underline">
+                    <Link to="/terms" className="hover:underline">
                       Terms
                     </Link>
                   </div>
@@ -224,14 +255,11 @@ export default function Register() {
 
               <div className="text-sm text-muted-foreground">
                 By registering, you agree to our{" "}
-                <Link href="/terms" className="text-[#9CCB3B] hover:underline">
+                <Link to="/terms" className="text-[#9CCB3B] hover:underline">
                   Terms of Service
                 </Link>
                 . Learn about how we process your data in our{" "}
-                <Link
-                  href="/privacy"
-                  className="text-[#9CCB3B] hover:underline"
-                >
+                <Link to="/privacy" className="text-[#9CCB3B] hover:underline">
                   Privacy Policy
                 </Link>
                 .

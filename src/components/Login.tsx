@@ -16,14 +16,48 @@ import logo from "../assets/quicklist-logo.png";
 import bg1 from "../assets/login-bg-1.png";
 import bg2 from "../assets/login-bg-2.png";
 import Footer from "./Footer";
+import type { User } from "@supabase/supabase-js";
+import { supabase } from "@/utils/supabaseClient";
+import { useUserContext } from "@/context/userContext";
+import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  // const [userData, setUserData] = useState<User | null>(null);
+  const { setUser } = useUserContext();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const message = location.state?.message;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Handle login logic here
+
+    const result = await supabase.auth.signInWithPassword({ email, password });
+    if (result.error) {
+      alert(result.error.message);
+    } else {
+      setUser(result.data.user);
+      console.log(result);
+      navigate("/");
+    }
   };
+
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   // Handle login logic here
+
+  //   const result = await supabase.auth.SignInWithPassword({ email, password });
+  //   if (result.error) {
+  //     alert(result.error.message);
+  //   } else {
+  //     setUserData(result.data ?? null);
+  //     console.log(result);
+  //   }
+  // };
 
   const footerLinks = {
     quicklist: {
@@ -121,13 +155,23 @@ export default function Login() {
               Log in to find and sell treasures in your area
             </CardDescription>
           </CardHeader>
+          <div className="bg-red-400">
+            {message && <p className="p-2">{message}</p>}
+          </div>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <label htmlFor="email" className="text-sm font-medium">
                   Email <span className="text-destructive">*</span>
                 </label>
-                <Input id="email" type="email" required className="w-full" />
+                <Input
+                  id="email"
+                  type="email"
+                  required
+                  className="w-full"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <label htmlFor="password" className="text-sm font-medium">
@@ -139,6 +183,8 @@ export default function Login() {
                     type={showPassword ? "text" : "password"}
                     required
                     className="w-full pr-10"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                   <Button
                     type="button"

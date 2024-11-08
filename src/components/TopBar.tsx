@@ -13,7 +13,7 @@ export default function TopBar() {
         </Button>
         <Button
           variant="outline"
-          className="text-[#4CAF50] hover:bg-white/20 hover:border-white"
+          className="text-[#4CAF50] hover:bg-white/20 hover:border-white mr-2"
         >
           <Link to="/register">Sign Up</Link>
         </Button>
