@@ -11,6 +11,8 @@ import {
   ArrowUpDown,
   Search,
   ShoppingCart,
+  Plus,
+  User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +38,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 import logo from "../assets/quicklist-logo.png";
+
+import { supabase } from "@/utils/supabaseClient";
+import { useUserContext } from "@/context/userContext";
 
 interface Category {
   id: string;
@@ -328,6 +340,13 @@ export default function NavBar() {
     );
   };
 
+  // useContext for user
+  const { user, setUser } = useUserContext();
+  const handleLogoutClick = () => {
+    setUser(null);
+    supabase.auth.signOut();
+  };
+
   return (
     <header className="bg-[#4CAF50] text-white">
       <div className="container mx-auto px-4 py-4">
@@ -518,10 +537,70 @@ export default function NavBar() {
             <Button variant="ghost" className="text-white p-2 hidden md:block">
               <ShoppingCart className="h-6 w-6" />
             </Button>
-            <Avatar>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="flex flex-row items-center gap-1 h-auto py-0 bg-inherit hover:bg-white/10 border-none focus:border-none"
+                  >
+                    <Avatar>
+                      <AvatarImage
+                        src="https://github.com/shadcn.png"
+                        alt="User"
+                      />
+                      <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
+
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>
+                    <Link to="/profile">Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to="/messages">Messages</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to="/watchlist">Watchlist</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="bg-slate-100">
+                    <button onClick={handleLogoutClick}>Logout</button>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="flex flex-row items-center gap-1 h-auto py-0 bg-inherit hover:bg-white/10 border-none focus:border-none"
+                  >
+                    <Avatar>
+                      <AvatarFallback>
+                        <User className="h-5 w-5 text-slate-600" />
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>
+                    <Link to="/register">Register</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to="/login">Login</Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {/* <Avatar>
               <AvatarImage src="https://github.com/shadcn.png" alt="User" />
               <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
+            </Avatar> */}
           </div>
         </div>
       </div>

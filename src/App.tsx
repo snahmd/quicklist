@@ -8,6 +8,8 @@ import Categories from "./pages/Categories";
 import CategoryDetail from "./pages/CategoryDetail";
 import Register from "./components/Register";
 import ResetPassword from "./components/ResetPassword";
+import Watchlist from "./pages/Watchlist";
+import Profile from "./pages/Profile";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +35,14 @@ const router = createBrowserRouter([
       {
         path: "/category/:id",
         element: <CategoryDetail />,
+      },
+      {
+        path: "/watchlist",
+        element: <Watchlist />,
+      },
+      {
+        path: "/profile",
+        element: <Profile />,
       },
     ],
   },
