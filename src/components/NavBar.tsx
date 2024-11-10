@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -13,6 +11,7 @@ import {
   ShoppingCart,
   Plus,
   User,
+  CopyPlus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -535,7 +534,9 @@ export default function NavBar() {
           </div>
           <div className="flex items-center md:gap-4">
             <Button variant="ghost" className="text-white p-2 hidden md:block">
-              <ShoppingCart className="h-6 w-6" />
+              <Link to="/add-article">
+                <CopyPlus className="h-6 w-6" />
+              </Link>
             </Button>
             {user ? (
               <DropdownMenu>

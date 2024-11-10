@@ -10,6 +10,7 @@ import Register from "./components/Register";
 import ResetPassword from "./components/ResetPassword";
 import Watchlist from "./pages/Watchlist";
 import Profile from "./pages/Profile";
+import AddArticle from "./pages/AddArticle";
 
 const router = createBrowserRouter([
   {
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <Profile />,
+      },
+      {
+        path: "/add-article",
+        element: <AddArticle />,
       },
     ],
   },

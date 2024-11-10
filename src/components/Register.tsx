@@ -48,59 +48,6 @@ export default function Register() {
     }
   };
 
-  const footerLinks = {
-    quicklist: {
-      title: "Quicklist",
-      links: [
-        { href: "/about", label: "About Us" },
-        { href: "/careers", label: "Careers" },
-        { href: "/press", label: "Press" },
-        { href: "/magazine", label: "Magazine" },
-        { href: "/sustainability", label: "Sustainability" },
-        { href: "/mobile-apps", label: "Mobile Apps" },
-      ],
-    },
-    information: {
-      title: "Information",
-      links: [
-        { href: "/help", label: "Help" },
-        { href: "/security", label: "Security Tips" },
-        { href: "/privacy", label: "Privacy Policy" },
-        { href: "/privacy-settings", label: "Privacy Settings" },
-        { href: "/terms", label: "Terms of Use" },
-        { href: "/imprint", label: "Imprint" },
-      ],
-    },
-    business: {
-      title: "For Business",
-      links: [
-        { href: "/business/real-estate", label: "Real Estate" },
-        { href: "/business/pro", label: "PRO for Business" },
-        { href: "/business/advertise", label: "Advertise" },
-      ],
-    },
-    social: {
-      title: "Social Media",
-      links: [
-        { href: "/social/facebook", label: "Facebook" },
-        { href: "/social/youtube", label: "YouTube" },
-        { href: "/social/instagram", label: "Instagram" },
-        { href: "/social/twitter", label: "Twitter" },
-        { href: "/social/pinterest", label: "Pinterest" },
-        { href: "/social/tiktok", label: "TikTok" },
-      ],
-    },
-    general: {
-      title: "General",
-      links: [
-        { href: "/popular", label: "Popular Searches" },
-        { href: "/listings", label: "Listings Overview" },
-        { href: "/business-pages", label: "Business Pages" },
-        { href: "/reviews", label: "Reviews" },
-      ],
-    },
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-[#9CCB3B]">
       {/* Header */}
