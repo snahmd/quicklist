@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Plus, X, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,6 +23,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { supabase } from "@/utils/supabaseClient";
+import { useUserContext } from "@/context/userContext";
 
 interface Address {
   firstName: string;
@@ -40,11 +40,15 @@ export function DeliveryAddressSection() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [savedAddress, setSavedAddress] = useState<Address | null>(null);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+  const { user } = useUserContext();
+  if (user) {
+    console.log(user.id);
+  }
 
   const handleSaveAddress = () => {
     if (editingAddress) {
       setSavedAddress(editingAddress);
-      setEditingAddress(null);
+      sendDatabase();
     }
     setIsAddDialogOpen(false);
   };
@@ -71,6 +75,20 @@ export function DeliveryAddressSection() {
 
   const handleDeleteAddress = () => {
     setSavedAddress(null);
+  };
+
+  const sendDatabase = async () => {
+    const { error } = await supabase.from("user_info").insert({
+      first_name: editingAddress?.firstName,
+      last_name: editingAddress?.lastName,
+      address_addition: editingAddress?.addressAddition,
+      street: editingAddress?.street,
+      house_no: editingAddress?.houseNumber,
+      postal_code: editingAddress?.postalCode,
+      city: editingAddress?.city,
+    });
+    setEditingAddress(null);
+    console.log(error);
   };
 
   return (

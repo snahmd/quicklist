@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   CreditCard,
@@ -10,6 +10,7 @@ import {
   Settings,
   User,
   X,
+  CameraIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +33,10 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { DeliveryAddressSection } from "@/components/DeliveryAddressSection";
 import ProfileHeader from "@/components/ProfileHeader";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { send } from "process";
+import { supabase } from "@/utils/supabaseClient";
+import { useUserContext } from "@/context/userContext";
 
 interface NavItem {
   icon: React.ReactNode;
@@ -137,11 +142,57 @@ function AccountSettingsSection() {
 export default function Profile() {
   const [profileName, setProfileName] = useState("Ahmed");
   const [activeSection, setActiveSection] = useState("profile");
+  const [avatarUrl, setAvatarUrl] = useState(
+    "/placeholder.svg?height=100&width=100"
+  );
+  const { user } = useUserContext();
+
+  useEffect(() => {
+    if (user) {
+      getAvatar();
+    }
+  }, [user]);
+
+  const getAvatar = async () => {
+    const { data, error } = await supabase.storage
+      .from("images")
+      .download(`${user?.id}/avatar.png`);
+    if (error) {
+      console.error("Error downloading avatar: ", error.message);
+    }
+    if (data) {
+      console.log(data);
+      const url = URL.createObjectURL(data);
+      setAvatarUrl(url);
+    }
+  };
+
+  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      sendToStorage(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setAvatarUrl(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const sendToStorage = async (file: File) => {
+    const { data, error } = await supabase.storage
+      .from("images")
+      .upload(`${user?.id}/avatar.png`, file, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+    console.log(data, error);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto p-6">
-        <ProfileHeader />
+        <ProfileHeader avatarUrl={avatarUrl} />
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Sidebar */}
           <div className="md:col-span-1">
@@ -175,11 +226,48 @@ export default function Profile() {
                 <div className="space-y-6">
                   {activeSection === "profile" && (
                     <>
+                      {/* Avatar Upload Section */}
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-medium">Profile Picture</h3>
+                        <div className="flex items-center gap-4">
+                          <Avatar className="w-24 h-24">
+                            <AvatarImage
+                              src={avatarUrl}
+                              alt="Profile picture"
+                            />
+                            <AvatarFallback>
+                              {profileName.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <Label
+                              htmlFor="avatar-upload"
+                              className="cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800">
+                                <CameraIcon className="w-5 h-5" />
+                                Change Picture
+                              </div>
+                            </Label>
+                            <Input
+                              id="avatar-upload"
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={handleAvatarChange}
+                            />
+                            <p className="mt-1 text-xs text-gray-500">
+                              JPG, GIF or PNG. Max size of 800K
+                            </p>
+                          </div>
+                        </div>
+                      </div>
                       {/* Profile Information */}
                       <div>
                         <h3 className="text-lg font-medium">
                           Profile Information
                         </h3>
+
                         <div className="mt-4 space-y-4">
                           <div className="flex items-end gap-4">
                             <div className="flex-1">

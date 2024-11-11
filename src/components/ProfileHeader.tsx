@@ -1,7 +1,10 @@
 import { Info, Shield, User, Clock, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { useUserContext } from "@/context/userContext";
+import { useEffect, useState } from "react";
+import { supabase } from "@/utils/supabaseClient";
 
-export default function ProfileHeader() {
+export default function ProfileHeader({ avatarUrl }: { avatarUrl: string }) {
   return (
     <Card className="mb-6 bg-white">
       <CardContent className="p-6">
@@ -9,7 +12,11 @@ export default function ProfileHeader() {
           {/* Avatar and Main Info */}
           <div className="flex items-center gap-6">
             <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
-              <span className="text-4xl text-gray-600">AS</span>
+              <img
+                src={avatarUrl!}
+                alt=""
+                className="object-cover w-full h-full"
+              />
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
