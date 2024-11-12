@@ -147,7 +147,7 @@ export default function Profile() {
   );
   const [firstName, setFirstName] = useState("Ahmed");
   const [lastName, setLastName] = useState("Smith");
-  const { user } = useUserContext();
+  const { user, loading } = useUserContext();
 
   useEffect(() => {
     if (user) {

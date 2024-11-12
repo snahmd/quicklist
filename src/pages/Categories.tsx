@@ -17,7 +17,7 @@ export default function Categories() {
   const categories: Category[] = [
     {
       name: "Cars, Bikes & Boats",
-      image: "/placeholder.svg?height=200&width=200",
+      image: "cars-bikes-boats.jpg",
       backgroundColor: "bg-blue-50",
       subcategories: [
         { name: "Cars" },
@@ -34,7 +34,7 @@ export default function Categories() {
     },
     {
       name: "Electronics",
-      image: "/placeholder.svg?height=200&width=200",
+      image: "electronics.jpg",
       backgroundColor: "bg-green-50",
       subcategories: [
         { name: "Audio & Hi-Fi" },
@@ -54,7 +54,7 @@ export default function Categories() {
     },
     {
       name: "Home & Garden",
-      image: "/placeholder.svg?height=200&width=200",
+      image: "home-garden.jpeg",
       backgroundColor: "bg-yellow-50",
       subcategories: [
         { name: "Bathroom" },
@@ -73,7 +73,7 @@ export default function Categories() {
     },
     {
       name: "Jobs",
-      image: "/placeholder.svg?height=200&width=200",
+      image: "jobs.jpg",
       backgroundColor: "bg-purple-50",
       subcategories: [
         { name: "Apprenticeships" },
@@ -91,13 +91,13 @@ export default function Categories() {
     },
     {
       name: "Neighborhood Help",
-      image: "/placeholder.svg?height=200&width=200",
+      image: "neighborhood-help.jpg",
       backgroundColor: "bg-teal-50",
       subcategories: [{ name: "Neighborhood Help" }],
     },
     {
       name: "Services",
-      image: "/placeholder.svg?height=200&width=200",
+      image: "services.webp",
       backgroundColor: "bg-pink-50",
       subcategories: [
         { name: "Elderly Care" },
@@ -114,7 +114,7 @@ export default function Categories() {
     },
     {
       name: "Family, Kids & Baby",
-      image: "/placeholder.svg?height=200&width=200",
+      image: "family-kids-baby.png",
       backgroundColor: "bg-indigo-50",
       subcategories: [
         { name: "Elderly Care" },
@@ -131,7 +131,7 @@ export default function Categories() {
     },
     {
       name: "Pets",
-      image: "/placeholder.svg?height=200&width=200",
+      image: "pets.jpg",
       backgroundColor: "bg-orange-50",
       subcategories: [
         { name: "Fish" },
@@ -148,7 +148,7 @@ export default function Categories() {
     },
     {
       name: "Fashion & Beauty",
-      image: "/placeholder.svg?height=200&width=200",
+      image: "fashion-beauty.jpg",
       backgroundColor: "bg-red-50",
       subcategories: [
         { name: "Beauty & Health" },
@@ -163,7 +163,7 @@ export default function Categories() {
     },
     {
       name: "Courses & Classes",
-      image: "/placeholder.svg?height=200&width=200",
+      image: "courses-classes.jpg",
       backgroundColor: "bg-cyan-50",
       subcategories: [
         { name: "Beauty & Health" },
@@ -182,7 +182,7 @@ export default function Categories() {
     },
     {
       name: "Tickets",
-      image: "/placeholder.svg?height=200&width=200",
+      image: "tickets.jpg",
       backgroundColor: "bg-gray-50",
       subcategories: [
         { name: "Public Transport" },
@@ -197,7 +197,7 @@ export default function Categories() {
     },
     {
       name: "Leisure, Hobbies & Neighborhood",
-      image: "/placeholder.svg?height=200&width=200",
+      image: "leisure-hobbies-neighborhood.jpg",
       backgroundColor: "bg-lime-50",
       subcategories: [
         { name: "Esotericism & Spirituality" },
@@ -217,7 +217,7 @@ export default function Categories() {
     },
     {
       name: "Real Estate",
-      image: "/placeholder.svg?height=200&width=200",
+      image: "real-estate.jpg",
       backgroundColor: "bg-emerald-50",
       subcategories: [
         { name: "Temporary Housing & Shared Housing" },
@@ -236,7 +236,7 @@ export default function Categories() {
     },
     {
       name: "Music, Movies & Books",
-      image: "/placeholder.svg?height=200&width=200",
+      image: "music-movies-books.jpg",
       backgroundColor: "bg-slate-100",
       subcategories: [
         { name: "Books & Magazines" },
@@ -251,7 +251,7 @@ export default function Categories() {
     },
     {
       name: "Giveaways & Swaps",
-      image: "/placeholder.svg?height=200&width=200",
+      image: "giveaways-swaps.jpg",
       backgroundColor: "bg-red-50",
       subcategories: [
         { name: "Swaps" },
@@ -282,9 +282,9 @@ export default function Categories() {
               <CardContent className="p-2 sm:p-4 md:p-6">
                 <div className="aspect-square relative mb-2 sm:mb-4 rounded-lg overflow-hidden">
                   <img
-                    src={category.image}
+                    src={`/categories/${category.image}`}
                     alt={category.name}
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300 h-full"
                   />
                 </div>
                 <h2 className="text-xs sm:text-sm md:text-base lg:text-lg font-semibold text-center truncate">

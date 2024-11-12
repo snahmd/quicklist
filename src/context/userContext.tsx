@@ -5,6 +5,7 @@ import { supabase } from "@/utils/supabaseClient";
 interface UserContextType {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  loading: boolean;
 }
 
 const UserContext = createContext<UserContextType>(null!);
@@ -15,17 +16,19 @@ export const UserContextProvider = ({
   children: React.ReactNode;
 }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     // Check if user is already logged in
     supabase.auth.getUser().then((user) => {
       if (user.data.user) {
         setUser(user.data.user);
       }
+      setLoading(false);
     });
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user, setUser, loading }}>
       {children}
     </UserContext.Provider>
   );
