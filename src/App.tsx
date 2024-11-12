@@ -11,6 +11,7 @@ import ResetPassword from "./components/ResetPassword";
 import Watchlist from "./pages/Watchlist";
 import Profile from "./pages/Profile";
 import AddArticle from "./pages/AddArticle";
+import ProtectedRoute from "./router/ProtectedRoute";
 
 const router = createBrowserRouter([
   {
@@ -26,10 +27,6 @@ const router = createBrowserRouter([
         element: <ArticleDetail />,
       },
       {
-        path: "/messages",
-        element: <Messages />,
-      },
-      {
         path: "/categories",
         element: <Categories />,
       },
@@ -38,16 +35,36 @@ const router = createBrowserRouter([
         element: <CategoryDetail />,
       },
       {
+        path: "/messages",
+        element: (
+          <ProtectedRoute>
+            <Messages />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "/watchlist",
-        element: <Watchlist />,
+        element: (
+          <ProtectedRoute>
+            <Watchlist />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/profile",
-        element: <Profile />,
+        element: (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/add-article",
-        element: <AddArticle />,
+        element: (
+          <ProtectedRoute>
+            <AddArticle />
+          </ProtectedRoute>
+        ),
       },
     ],
   },

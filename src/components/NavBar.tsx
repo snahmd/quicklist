@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ChevronDown,
@@ -346,6 +346,30 @@ export default function NavBar() {
     supabase.auth.signOut();
   };
 
+  // get avatarUrl for user
+  const [avatarUrl, setAvatarUrl] = useState(
+    "/placeholder.svg?height=100&width=100"
+  );
+
+  useEffect(() => {
+    if (user) {
+      getAvatar();
+    }
+  }, [user]);
+
+  const getAvatar = async () => {
+    const { data, error } = await supabase.storage
+      .from("images")
+      .download(`${user?.id}/avatar.png`);
+
+    if (error) {
+      console.log("Error downloading avatar: ", error.message);
+    } else {
+      const url = URL.createObjectURL(data);
+      setAvatarUrl(url);
+    }
+  };
+
   return (
     <header className="bg-[#4CAF50] text-white">
       <div className="container mx-auto px-4 py-4">
@@ -546,10 +570,11 @@ export default function NavBar() {
                     className="flex flex-row items-center gap-1 h-auto py-0 bg-inherit hover:bg-white/10 border-none focus:border-none"
                   >
                     <Avatar>
-                      <AvatarImage
+                      {/* <AvatarImage
                         src="https://github.com/shadcn.png"
                         alt="User"
-                      />
+                      /> */}
+                      <AvatarImage src={avatarUrl} alt="User" />
                       <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
 

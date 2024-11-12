@@ -26,14 +26,7 @@ export default function ProfileHeader({ avatarUrl }: { avatarUrl: string }) {
                   <span className="sr-only">Info</span>
                 </button>
               </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Shield className="w-4 h-4" />
-                <span>Secure payment set up</span>
-                <button className="text-[#447604]">
-                  <Info className="w-4 h-4" />
-                  <span className="sr-only">Info</span>
-                </button>
-              </div>
+              <div className="flex items-center gap-2 text-sm"></div>
               <p className="text-sm text-gray-600">0 ads online / 67 total</p>
             </div>
           </div>

@@ -145,6 +145,8 @@ export default function Profile() {
   const [avatarUrl, setAvatarUrl] = useState(
     "/placeholder.svg?height=100&width=100"
   );
+  const [firstName, setFirstName] = useState("Ahmed");
+  const [lastName, setLastName] = useState("Smith");
   const { user } = useUserContext();
 
   useEffect(() => {
@@ -186,6 +188,16 @@ export default function Profile() {
         cacheControl: "3600",
         upsert: true,
       });
+    console.log(data, error);
+  };
+
+  const handleProfilName = async () => {
+    const { data, error } = await supabase.from("profiles").upsert({
+      id: user?.id,
+      profile_name: profileName,
+      first_name: firstName,
+      last_name: lastName,
+    });
     console.log(data, error);
   };
 
@@ -234,6 +246,7 @@ export default function Profile() {
                             <AvatarImage
                               src={avatarUrl}
                               alt="Profile picture"
+                              className="object-cover w-full h-full"
                             />
                             <AvatarFallback>
                               {profileName.charAt(0).toUpperCase()}
@@ -281,8 +294,45 @@ export default function Profile() {
                               />
                             </div>
                             <div className="flex gap-2">
-                              <Button variant="outline">Cancel</Button>
-                              <Button>Save</Button>
+                              <Button
+                                onClick={() => {
+                                  setProfileName("");
+                                }}
+                                variant="outline"
+                              >
+                                Cancel
+                              </Button>
+                              <Button onClick={handleProfilName}>Save</Button>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <Label
+                                htmlFor="firstName"
+                                className="block text-sm font-medium text-gray-700"
+                              >
+                                First Name
+                              </Label>
+                              <Input
+                                id="firstName"
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
+                                className="mt-1"
+                              />
+                            </div>
+                            <div>
+                              <Label
+                                htmlFor="lastName"
+                                className="block text-sm font-medium text-gray-700"
+                              >
+                                Last Name
+                              </Label>
+                              <Input
+                                id="lastName"
+                                value={lastName}
+                                onChange={(e) => setLastName(e.target.value)}
+                                className="mt-1"
+                              />
                             </div>
                           </div>
                         </div>
