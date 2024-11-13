@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   X,
@@ -16,6 +16,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
+import { useParams } from "react-router-dom";
+import { supabase } from "@/utils/supabaseClient";
 
 interface Product {
   id: string;
@@ -44,13 +46,57 @@ export default function CategoryDetail() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [expandedProduct, setExpandedProduct] = useState<string | null>(null);
+  const { name, id } = useParams();
+  console.log(id);
+  console.log(name);
+  const [category, setCategory] = useState<any>(null);
+  const [subCategories, setSubCategories] = useState<any>(null);
 
-  const category = {
-    id: "furniture",
-    name: "Furniture",
-    image: "/placeholder.svg?height=200&width=200",
-    backgroundColor: "bg-emerald-50",
+  const getCategory = async () => {
+    const { data, error } = await supabase
+      .from("categories")
+      .select(
+        `
+      name,
+      bg_color,
+      id,
+      image,
+      sub_categories(
+        id,
+        name
+      )
+      `
+      )
+      .eq("id", id);
+    if (error) {
+      console.error(error);
+      return;
+    }
+    console.log(data);
+    setCategory(data[0]);
   };
+
+  useEffect(() => {
+    getCategory();
+  }, []);
+
+  // console.log(id);
+  // const getSubCategories = async () => {
+  //   const { data, error } = await supabase
+  //     .from("sub_categories")
+  //     .select("*")
+  //     .eq("category_id", id);
+  //   if (error) {
+  //     console.error(error);
+  //     return;
+  //   }
+  //   console.log(data);
+  //   setSubCategories(data);
+  // };
+
+  // useEffect(() => {
+  //   getSubCategories();
+  // }, []);
 
   const products: Product[] = [
     {
@@ -202,6 +248,22 @@ export default function CategoryDetail() {
     }
   };
 
+  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>(
+    []
+  );
+
+  const handleSubcategoryClick = (subcategoryName: string) => {
+    if (!selectedSubcategories.includes(subcategoryName)) {
+      setSelectedSubcategories([...selectedSubcategories, subcategoryName]);
+    }
+  };
+
+  const handleRemoveSubcategory = (subcategoryName: string) => {
+    setSelectedSubcategories(
+      selectedSubcategories.filter((name) => name !== subcategoryName)
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Category Header */}
@@ -215,21 +277,59 @@ export default function CategoryDetail() {
 
       <div className="container mx-auto px-4 py-6">
         {/* Selected Category Card */}
-        <Card className={`mb-6 ${category.backgroundColor}`}>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="w-20 h-20 relative rounded-lg overflow-hidden">
-                <img
-                  src={category.image}
-                  alt={category.name}
-                  fill
-                  className="object-cover"
-                />
+        {category && (
+          <Card className={`mb-6 ${category.backgroundColor}`}>
+            <CardContent className="p-6">
+              <div className="flex flex-col justify-center items-center md:flex-row md:justify-start  gap-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-20 h-20 relative rounded-lg overflow-hidden">
+                    <img
+                      src={`/categories/${category.image}`}
+                      alt={category.name}
+                      className="object-cover h-full w-full"
+                    />
+                  </div>
+                  <h1 className="text-2xl font-bold">{category.name}</h1>
+                </div>
+                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {category.sub_categories.map((subcategory) => (
+                    <Button
+                      key={subcategory.id}
+                      variant="outline"
+                      className="text-sm justify-start hover:bg-green-100 hover:text-green-800 transition-colors"
+                      onClick={() => handleSubcategoryClick(subcategory.name)}
+                    >
+                      {subcategory.name}
+                    </Button>
+                  ))}
+                </div>
               </div>
-              <h1 className="text-2xl font-bold">{category.name}</h1>
-            </div>
-          </CardContent>
-        </Card>
+              {selectedSubcategories.length > 0 && (
+                <div className="mt-4 p-4 bg-green-100 rounded-md">
+                  <div className="flex flex-wrap gap-2">
+                    {selectedSubcategories.map((subcategory, index) => (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="px-2 py-1 text-sm bg-white"
+                      >
+                        {subcategory}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="ml-1 p-0 h-auto hover:bg-transparent"
+                          onClick={() => handleRemoveSubcategory(subcategory)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Search and Filters */}
         <div className="mb-6 space-y-4">
@@ -405,7 +505,6 @@ export default function CategoryDetail() {
               <img
                 src={selectedProduct.images[currentImageIndex]}
                 alt={selectedProduct.title}
-                fill
                 className="object-cover"
               />
             )}
