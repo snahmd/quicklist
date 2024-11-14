@@ -20,49 +20,49 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { supabase } from "@/utils/supabaseClient";
 
 interface Category {
   id: string;
   name: string;
-  subcategories?: {
+  sub_categories?: {
     id: string;
     name: string;
-    types?: { id: string; name: string }[];
   }[];
 }
 
-const categories: Category[] = [
-  {
-    id: "auto",
-    name: "Auto, Bike & Boat",
-    subcategories: [
-      {
-        id: "auto",
-        name: "Auto",
-        types: [
-          { id: "repair", name: "Repairs" },
-          { id: "rental", name: "Rental" },
-        ],
-      },
-    ],
-  },
-  {
-    id: "services",
-    name: "Services",
-    subcategories: [
-      {
-        id: "house-garden",
-        name: "House & Garden",
-        types: [
-          { id: "cleaning", name: "Cleaning Service" },
-          { id: "repair", name: "Repairs" },
-          { id: "garden", name: "Gardening & Landscaping" },
-        ],
-      },
-    ],
-  },
-  // You can add more categories as needed
-];
+// const categories: Category[] = [
+//   {
+//     id: "auto",
+//     name: "Auto, Bike & Boat",
+//     subcategories: [
+//       {
+//         id: "auto",
+//         name: "Auto",
+//         types: [
+//           { id: "repair", name: "Repairs" },
+//           { id: "rental", name: "Rental" },
+//         ],
+//       },
+//     ],
+//   },
+//   {
+//     id: "services",
+//     name: "Services",
+//     subcategories: [
+//       {
+//         id: "house-garden",
+//         name: "House & Garden",
+//         types: [
+//           { id: "cleaning", name: "Cleaning Service" },
+//           { id: "repair", name: "Repairs" },
+//           { id: "garden", name: "Gardening & Landscaping" },
+//         ],
+//       },
+//     ],
+//   },
+//   // You can add more categories as needed
+// ];
 
 const plzToLocation: { [key: string]: string } = {
   "13086": "Berlin - Weißensee",
@@ -76,38 +76,43 @@ export default function AddArticle() {
   // Persistent selections
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>("");
-  const [selectedType, setSelectedType] = useState<string>("");
 
   // Temporary selections
   const [tempSelectedCategory, setTempSelectedCategory] = useState<string>("");
   const [tempSelectedSubcategory, setTempSelectedSubcategory] =
     useState<string>("");
-  const [tempSelectedType, setTempSelectedType] = useState<string>("");
 
   const [images, setImages] = useState<string[]>([]);
-  const [formData, setFormData] = useState({
-    type: "offer", // or "search"
-    title: "",
-    category: "",
-    price: "",
-    priceType: "fixed",
-    description: "",
-    postalCode: "",
-    location: "",
-    name: "",
-  });
+  const [formData, setFormData] = useState<null | any>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     // Load saved data from localStorage
     const savedData = localStorage.getItem("createListingFormData");
     if (savedData) {
       setFormData(JSON.parse(savedData));
+    } else {
+      setFormData({
+        type: "offer", // or "search"
+        title: "",
+        category: "",
+        images: [],
+        price: "",
+        priceType: "",
+        description: "",
+        postalCode: "",
+        name: "",
+        condition: "",
+        shipping: "",
+      });
     }
   }, []);
 
   useEffect(() => {
-    // Save formData to localStorage whenever it changes
-    localStorage.setItem("createListingFormData", JSON.stringify(formData));
+    if (formData) {
+      // Save data to localStorage
+      localStorage.setItem("createListingFormData", JSON.stringify(formData));
+    }
   }, [formData]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,16 +138,58 @@ export default function AddArticle() {
     }));
   };
 
+  const sendArticle = async () => {
+    const { error } = await supabase.from("articles").insert({
+      title: formData.title,
+      subcategory_id: selectedSubcategory,
+      price: formData.price,
+      price_type: formData.priceType,
+      description: formData.description,
+      postal_code: formData.postalCode,
+      ad_type: formData.type,
+      condition: formData.condition,
+      shipping: formData.shipping,
+    });
+  };
+
+  const fetchCategories = async () => {
+    const { data, error } = await supabase
+      .from("categories")
+      .select(`id, name, sub_categories(id, name)`);
+    if (error) {
+      console.error("Error fetching categories", error);
+      return;
+    }
+
+    console.log(data);
+    setCategories(data);
+  };
+  useEffect(() => {
+    console.log(categories);
+  }, [categories]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    sendArticle();
+  };
+
+  if (!formData) {
+    return null;
+  }
   return (
     <div className="container mx-auto py-6 max-w-3xl">
       <h1 className="text-2xl font-bold mb-6">Ad Details</h1>
 
-      <form className="space-y-6">
+      <form className="space-y-6" onSubmit={handleSubmit}>
         {/* Offer/Search Type */}
         <div className="space-y-2">
           <Label>Offer / Search</Label>
           <RadioGroup
-            value={formData.type}
+            value={formData?.type}
             onValueChange={(value) =>
               setFormData((prev) => ({ ...prev, type: value }))
             }
@@ -188,7 +235,6 @@ export default function AddArticle() {
                   // Set temporary selections to current selections
                   setTempSelectedCategory(selectedCategory);
                   setTempSelectedSubcategory(selectedSubcategory);
-                  setTempSelectedType(selectedType);
                 }}
               >
                 {formData.category || "Choose your category"}
@@ -199,7 +245,7 @@ export default function AddArticle() {
               <DialogHeader>
                 <DialogTitle>Select Category</DialogTitle>
               </DialogHeader>
-              <div className="grid grid-cols-3 gap-4 h-[600px]">
+              <div className="grid grid-cols-2 gap-4 h-[600px]">
                 {/* Main Categories */}
                 <div className="border-r">
                   <div className="space-y-1">
@@ -215,7 +261,6 @@ export default function AddArticle() {
                         onClick={() => {
                           setTempSelectedCategory(category.id);
                           setTempSelectedSubcategory("");
-                          setTempSelectedType("");
                         }}
                       >
                         {category.name}
@@ -231,7 +276,7 @@ export default function AddArticle() {
                     <div className="space-y-1">
                       {categories
                         .find((c) => c.id === tempSelectedCategory)
-                        ?.subcategories?.map((sub) => (
+                        ?.sub_categories?.map((sub) => (
                           <Button
                             key={sub.id}
                             variant={
@@ -242,40 +287,10 @@ export default function AddArticle() {
                             className="w-full justify-between"
                             onClick={() => {
                               setTempSelectedSubcategory(sub.id);
-                              setTempSelectedType("");
                             }}
                           >
                             {sub.name}
                             <ChevronRight className="h-4 w-4" />
-                          </Button>
-                        ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Types */}
-                <div>
-                  {tempSelectedSubcategory && (
-                    <div className="space-y-1">
-                      {categories
-                        .find((c) => c.id === tempSelectedCategory)
-                        ?.subcategories?.find(
-                          (s) => s.id === tempSelectedSubcategory
-                        )
-                        ?.types?.map((type) => (
-                          <Button
-                            key={type.id}
-                            variant={
-                              tempSelectedType === type.id
-                                ? "secondary"
-                                : "ghost"
-                            }
-                            className="w-full justify-between"
-                            onClick={() => {
-                              setTempSelectedType(type.id);
-                            }}
-                          >
-                            {type.name}
                           </Button>
                         ))}
                     </div>
@@ -290,17 +305,14 @@ export default function AddArticle() {
                     // Make selections permanent
                     setSelectedCategory(tempSelectedCategory);
                     setSelectedSubcategory(tempSelectedSubcategory);
-                    setSelectedType(tempSelectedType);
 
                     // Update category information
+
                     const category = categories.find(
                       (c) => c.id === tempSelectedCategory
                     );
-                    const subcategory = category?.subcategories?.find(
+                    const subcategory = category?.sub_categories?.find(
                       (s) => s.id === tempSelectedSubcategory
-                    );
-                    const type = subcategory?.types?.find(
-                      (t) => t.id === tempSelectedType
                     );
 
                     let categoryString = "";
@@ -308,9 +320,6 @@ export default function AddArticle() {
                       categoryString = category.name;
                       if (subcategory) {
                         categoryString += ` > ${subcategory.name}`;
-                        if (type) {
-                          categoryString += ` > ${type.name}`;
-                        }
                       }
                     }
 
@@ -355,9 +364,54 @@ export default function AddArticle() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="fixed">Fixed Price</SelectItem>
-                <SelectItem value="negotiable">Negotiable</SelectItem>
-                <SelectItem value="giveaway">Giveaway</SelectItem>
+                <SelectItem value="Fixed Price">Fixed Price</SelectItem>
+                <SelectItem value="Negotiable">Negotiable</SelectItem>
+                <SelectItem value="Giveaway">Giveaway</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Condition */}
+        <div className="grid grid-cols-1 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="condition">Condition</Label>
+            <Select
+              value={formData.condition}
+              onValueChange={(value) =>
+                setFormData((prev) => ({ ...prev, condition: value }))
+              }
+            >
+              <SelectTrigger id="condition">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="New">New</SelectItem>
+                <SelectItem value="Like New">Like New</SelectItem>
+                <SelectItem value="Good">Good</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Shipping */}
+        <div className="grid grid-cols-1 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="shipping">Shipping</Label>
+            <Select
+              value={formData.shipping}
+              onValueChange={(value) =>
+                setFormData((prev) => ({ ...prev, shipping: value }))
+              }
+            >
+              <SelectTrigger id="shipping">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Shipping Available">
+                  Shipping Available
+                </SelectItem>
+                <SelectItem value="Pickup Only">Pickup Only</SelectItem>
               </SelectContent>
             </Select>
           </div>
