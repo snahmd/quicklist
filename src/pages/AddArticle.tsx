@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/utils/supabaseClient";
+import { useUserContext } from "@/context/userContext";
+import { decode } from "base64-arraybuffer";
 
 interface Category {
   id: string;
@@ -82,7 +84,7 @@ export default function AddArticle() {
   const [tempSelectedSubcategory, setTempSelectedSubcategory] =
     useState<string>("");
 
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<{ file: File; url: string }[]>([]);
   const [formData, setFormData] = useState<null | any>(null);
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -118,9 +120,10 @@ export default function AddArticle() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      const newImages = Array.from(files).map((file) =>
-        URL.createObjectURL(file)
-      );
+      const newImages = Array.from(files).map((file) => ({
+        file,
+        url: URL.createObjectURL(file),
+      }));
       setImages((prev) => [...prev, ...newImages]);
     }
   };
@@ -138,18 +141,34 @@ export default function AddArticle() {
     }));
   };
 
+  const { user } = useUserContext();
+
   const sendArticle = async () => {
-    const { error } = await supabase.from("articles").insert({
-      title: formData.title,
-      subcategory_id: selectedSubcategory,
-      price: formData.price,
-      price_type: formData.priceType,
-      description: formData.description,
-      postal_code: formData.postalCode,
-      ad_type: formData.type,
-      condition: formData.condition,
-      shipping: formData.shipping,
-    });
+    if (!user) {
+      console.error("User not logged in");
+      return;
+    }
+    const { data, error } = await supabase
+      .from("articles")
+      .insert({
+        title: formData.title,
+        subcategory_id: selectedSubcategory,
+        price: formData.price,
+        price_type: formData.priceType,
+        description: formData.description,
+        postal_code: formData.postalCode,
+        ad_type: formData.type,
+        condition: formData.condition,
+        shipping: formData.shipping,
+        user_id: user.id,
+      })
+      .select();
+    if (error) {
+      console.error("Error inserting article", error);
+      return;
+    }
+    console.log(data);
+    return data;
   };
 
   const fetchCategories = async () => {
@@ -172,9 +191,32 @@ export default function AddArticle() {
     fetchCategories();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const sendImages = async (article_id: string) => {
+    if (images.length > 0) {
+      for (let i = 0; i < images.length; i++) {
+        const file = images[i].file;
+        const { data, error } = await supabase.storage
+          .from("article_images")
+          .upload(`${article_id}/image_${i}`, file, {
+            contentType: file.type,
+          });
+        if (error) {
+          console.error("Error inserting image", error);
+          return;
+        }
+        console.log(data);
+      }
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    sendArticle();
+    const data = await sendArticle();
+    console.log("-----");
+    console.log(data);
+    console.log("-----");
+    const article_id = data?.[0]?.id;
+    sendImages(article_id);
   };
 
   if (!formData) {
@@ -459,7 +501,7 @@ export default function AddArticle() {
               {images.map((image, index) => (
                 <div key={index} className="relative w-32 h-32 group">
                   <img
-                    src={image}
+                    src={image.url}
                     alt={`Upload ${index + 1}`}
                     className="object-cover rounded-lg w-full h-full"
                   />
