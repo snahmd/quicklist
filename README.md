@@ -18,3 +18,7 @@ Quicklist is a fast and efficient listing application that allows users to post 
 - **Shadcn**: For component styling and design.
 - **Tailwind CSS**: As a utility-first CSS framework.
 - **Supabase**: For backend services and database management.
+
+## Live Demo
+
+Check out the live demo: [QuickList on Vercel](https://q-list.vercel.app)
