@@ -222,7 +222,6 @@ export default function CategoryDetail() {
                 <img
                   src={watchlist.image}
                   alt={watchlist.name}
-                  fill
                   className="object-cover"
                 />
               </div>
@@ -285,7 +284,6 @@ export default function CategoryDetail() {
                     <img
                       src={product.images[0]}
                       alt={product.title}
-                      fill
                       className="object-cover"
                     />
                     <Badge
@@ -405,7 +403,6 @@ export default function CategoryDetail() {
               <img
                 src={selectedProduct.images[currentImageIndex]}
                 alt={selectedProduct.title}
-                fill
                 className="object-cover"
               />
             )}

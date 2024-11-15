@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import {
   Eye,
   Heart,
@@ -14,7 +13,6 @@ import {
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 

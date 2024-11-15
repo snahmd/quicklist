@@ -6,10 +6,7 @@ import {
   X,
   Filter as FilterIcon,
   Sliders,
-  ArrowUpDown,
   Search,
-  ShoppingCart,
-  Plus,
   User,
   CopyPlus,
 } from "lucide-react";

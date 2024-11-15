@@ -22,7 +22,8 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/utils/supabaseClient";
 import { useUserContext } from "@/context/userContext";
-import { decode } from "base64-arraybuffer";
+import { useNavigate } from "react-router-dom";
+import { slug } from "@/utils/slug";
 
 interface Category {
   id: string;
@@ -91,6 +92,7 @@ export default function AddArticle() {
   useEffect(() => {
     // Load saved data from localStorage
     const savedData = localStorage.getItem("createListingFormData");
+    //localStorage.removeItem("createListingFormData");
     if (savedData) {
       setFormData(JSON.parse(savedData));
     } else {
@@ -134,7 +136,7 @@ export default function AddArticle() {
 
   const handlePostalCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const postalCode = e.target.value;
-    setFormData((prev) => ({
+    setFormData((prev: any) => ({
       ...prev,
       postalCode,
       location: plzToLocation[postalCode] || "",
@@ -191,7 +193,7 @@ export default function AddArticle() {
     fetchCategories();
   }, []);
 
-  const sendImages = async (article_id: string) => {
+  const sendImages = async (data: any[] | undefined, article_id: string) => {
     if (images.length > 0) {
       for (let i = 0; i < images.length; i++) {
         const file = images[i].file;
@@ -207,7 +209,10 @@ export default function AddArticle() {
         console.log(data);
       }
     }
+    navigate(`/article-detail/${slug(data?.[0]?.title)}/${article_id}`);
   };
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -216,7 +221,8 @@ export default function AddArticle() {
     console.log(data);
     console.log("-----");
     const article_id = data?.[0]?.id;
-    sendImages(article_id);
+    localStorage.removeItem("createListingFormData");
+    sendImages(data, article_id);
   };
 
   if (!formData) {
@@ -233,7 +239,7 @@ export default function AddArticle() {
           <RadioGroup
             value={formData?.type}
             onValueChange={(value) =>
-              setFormData((prev) => ({ ...prev, type: value }))
+              setFormData((prev: any) => ({ ...prev, type: value }))
             }
             className="flex gap-4"
           >
@@ -255,7 +261,7 @@ export default function AddArticle() {
             id="title"
             value={formData.title}
             onChange={(e) =>
-              setFormData((prev) => ({ ...prev, title: e.target.value }))
+              setFormData((prev: any) => ({ ...prev, title: e.target.value }))
             }
           />
           <p className="text-sm text-gray-500">
@@ -365,7 +371,7 @@ export default function AddArticle() {
                       }
                     }
 
-                    setFormData((prev) => ({
+                    setFormData((prev: any) => ({
                       ...prev,
                       category: categoryString,
                     }));
@@ -390,7 +396,7 @@ export default function AddArticle() {
               type="number"
               value={formData.price}
               onChange={(e) =>
-                setFormData((prev) => ({ ...prev, price: e.target.value }))
+                setFormData((prev: any) => ({ ...prev, price: e.target.value }))
               }
             />
           </div>
@@ -399,7 +405,7 @@ export default function AddArticle() {
             <Select
               value={formData.priceType}
               onValueChange={(value) =>
-                setFormData((prev) => ({ ...prev, priceType: value }))
+                setFormData((prev: any) => ({ ...prev, priceType: value }))
               }
             >
               <SelectTrigger id="priceType">
@@ -421,7 +427,7 @@ export default function AddArticle() {
             <Select
               value={formData.condition}
               onValueChange={(value) =>
-                setFormData((prev) => ({ ...prev, condition: value }))
+                setFormData((prev: any) => ({ ...prev, condition: value }))
               }
             >
               <SelectTrigger id="condition">
@@ -443,7 +449,7 @@ export default function AddArticle() {
             <Select
               value={formData.shipping}
               onValueChange={(value) =>
-                setFormData((prev) => ({ ...prev, shipping: value }))
+                setFormData((prev: any) => ({ ...prev, shipping: value }))
               }
             >
               <SelectTrigger id="shipping">
@@ -466,7 +472,7 @@ export default function AddArticle() {
             id="description"
             value={formData.description}
             onChange={(e) =>
-              setFormData((prev) => ({
+              setFormData((prev: any) => ({
                 ...prev,
                 description: e.target.value,
               }))
@@ -555,7 +561,7 @@ export default function AddArticle() {
             id="name"
             value={formData.name}
             onChange={(e) =>
-              setFormData((prev) => ({ ...prev, name: e.target.value }))
+              setFormData((prev: any) => ({ ...prev, name: e.target.value }))
             }
           />
         </div>

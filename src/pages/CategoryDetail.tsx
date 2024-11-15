@@ -50,7 +50,6 @@ export default function CategoryDetail() {
   console.log(id);
   console.log(name);
   const [category, setCategory] = useState<any>(null);
-  const [subCategories, setSubCategories] = useState<any>(null);
 
   const getCategory = async () => {
     const { data, error } = await supabase
@@ -292,7 +291,7 @@ export default function CategoryDetail() {
                   <h1 className="text-2xl font-bold">{category.name}</h1>
                 </div>
                 <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                  {category.sub_categories.map((subcategory) => (
+                  {category.sub_categories.map((subcategory: any) => (
                     <Button
                       key={subcategory.id}
                       variant="outline"
@@ -385,7 +384,6 @@ export default function CategoryDetail() {
                     <img
                       src={product.images[0]}
                       alt={product.title}
-                      fill
                       className="object-cover"
                     />
                     <Badge

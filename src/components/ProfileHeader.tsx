@@ -1,8 +1,5 @@
 import { Info, Shield, User, Clock, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { useUserContext } from "@/context/userContext";
-import { useEffect, useState } from "react";
-import { supabase } from "@/utils/supabaseClient";
 
 export default function ProfileHeader({ avatarUrl }: { avatarUrl: string }) {
   return (

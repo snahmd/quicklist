@@ -1,15 +1,13 @@
-import { NavLink, Outlet } from "react-router-dom";
-import Header from "./Header";
+import { Outlet, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import Footer from "./Footer";
-import { useUserContext } from "@/context/userContext";
+import Header from "./Header";
 
 export default function Layout() {
-  // const { user } = useUserContext();
-  // const handleLogoutClick = () => {
-  //   // Handle logout logic here
-  //   setUser(null);
-  //   supabase.auth.signOut();
-  // };
+  const location = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0 });
+  }, [location]);
 
   return (
     <div className="flex min-h-screen flex-col">

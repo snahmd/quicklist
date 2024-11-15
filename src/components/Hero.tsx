@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import hero1 from "@/assets/hero-kleidung.jpg";
-import hero2 from "@/assets/hero-tv.jpg";
 import hero3 from "@/assets/hero-möbel.jpg";
 import hero4 from "@/assets/images.jpeg";
 

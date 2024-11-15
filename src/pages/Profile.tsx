@@ -1,17 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import {
-  CreditCard,
-  Eye,
-  Info,
-  Lock,
-  Mail,
-  Plus,
-  Settings,
-  User,
-  X,
-  CameraIcon,
-} from "lucide-react";
+
+import { Eye, Settings, User, CameraIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,19 +11,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+
 import { Separator } from "@/components/ui/separator";
 import { DeliveryAddressSection } from "@/components/DeliveryAddressSection";
 import ProfileHeader from "@/components/ProfileHeader";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { send } from "process";
+
 import { supabase } from "@/utils/supabaseClient";
 import { useUserContext } from "@/context/userContext";
 
@@ -147,7 +129,7 @@ export default function Profile() {
   );
   const [firstName, setFirstName] = useState("Ahmed");
   const [lastName, setLastName] = useState("Smith");
-  const { user, loading } = useUserContext();
+  const { user } = useUserContext();
 
   useEffect(() => {
     if (user) {

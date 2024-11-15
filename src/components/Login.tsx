@@ -16,7 +16,6 @@ import logo from "../assets/quicklist-logo.png";
 import bg1 from "../assets/login-bg-1.png";
 import bg2 from "../assets/login-bg-2.png";
 import Footer from "./Footer";
-import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/utils/supabaseClient";
 import { useUserContext } from "@/context/userContext";
 import { useNavigate } from "react-router-dom";

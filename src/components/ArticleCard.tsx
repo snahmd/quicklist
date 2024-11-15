@@ -1,19 +1,28 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
-import { supabase } from "@/utils/supabaseClient";
-import { useEffect, useState } from "react";
 import { slug } from "@/utils/slug";
+import { Image } from "@/pages/Articles";
 
-export default function ArticleCard({ articles }: { articles: any[] }) {
+export default function ArticleCard({
+  articles,
+  articleImages,
+}: {
+  articles: any[];
+  articleImages: Image[];
+}) {
   return (
     <>
       {articles.map((item) => (
-        <Card key={item}>
+        <Card key={item.id}>
           <Link to={`/article-detail/${slug(item.title)}/${item.id}`}>
             <CardContent className="p-4">
               <img
-                src="/placeholder.svg?height=200&width=200"
+                src={
+                  articleImages.filter(
+                    (image) => image.articleId === item.id
+                  )[0].imageUrl
+                }
                 alt={`Ad ${item}`}
                 width={200}
                 height={200}

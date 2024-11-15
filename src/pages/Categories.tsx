@@ -263,7 +263,7 @@ export default function Categories() {
   //     ],
   //   },
   // ];
-  const [category, setCategory] = useState<Category[]>([]);
+  const [category, setCategory] = useState<Category[] | null>([]);
 
   const getCategories = async () => {
     const { data, error } = await supabase.from("categories").select();
@@ -289,7 +289,7 @@ export default function Categories() {
       </div>
 
       <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
-        {category.map((category) => (
+        {category?.map((category) => (
           <Link
             key={category.id}
             to={`/category/${slug(category.name)}/${category.id}`}
