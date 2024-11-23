@@ -12,6 +12,7 @@ import Watchlist from "./pages/Watchlist";
 import Profile from "./pages/Profile";
 import AddArticle from "./pages/AddArticle";
 import ProtectedRoute from "./router/ProtectedRoute";
+import Search from "./pages/Search";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
       {
         path: "/category/:name/:id",
         element: <CategoryDetail />,
+      },
+      {
+        path: "/search",
+        element: <Search />,
       },
       {
         path: "/messages",
