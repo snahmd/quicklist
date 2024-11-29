@@ -30,6 +30,8 @@ export default function ArticleDetail() {
   //   "/placeholder.svg?height=600&width=800",
   // ];
   const [images, setImages] = useState<string[]>([]);
+  const [profile, setProfile] = useState<any>(null);
+  const [avatarUrl, setAvatarUrl] = useState<any>(null);
 
   const { title, id } = useParams();
   console.log(title, id);
@@ -75,6 +77,51 @@ export default function ArticleDetail() {
   useEffect(() => {
     getArticleImages();
   }, []);
+
+  useEffect(() => {
+    console.log(currentArticle)
+  }, [currentArticle])
+
+
+
+  const fetchProfile = async () => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", currentArticle.user_id);
+    if (error) {
+      console.error(error);
+      return;
+    }
+    console.log(data);
+    setProfile(data[0]);
+  }
+
+  useEffect(() => {
+    if (currentArticle.user_id)
+    fetchProfile();
+  }, [currentArticle])
+
+
+  // const { data } = supabase
+  // .storage
+  // .from('public-bucket')
+  // .getPublicUrl('folder/avatar1.png')
+  
+ const getAvatarImages = async () => {
+    // if (!currentArticle) return;
+    const {data} = await supabase.storage.from("images").getPublicUrl(`${currentArticle?.user_id}/avatar.png`);
+    
+    console.log(data);
+    setAvatarUrl(data);
+  
+  }
+
+  useEffect(() => {
+    if (currentArticle.user_id)
+    getAvatarImages();
+  }, [currentArticle])
+  
 
   return (
     <div>
@@ -219,23 +266,27 @@ export default function ArticleDetail() {
 
             <Card>
               <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-6">
+                {profile && (
+                  <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-4">
                     <Avatar className="h-12 w-12">
-                      <AvatarImage src="/placeholder.svg?height=48&width=48" />
-                      <AvatarFallback>AS</AvatarFallback>
+                      <AvatarImage src={avatarUrl.publicUrl} />
+              
+                      <AvatarFallback>{`${profile.first_name[0]}`}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <h3 className="font-semibold">Ahmed San</h3>
-                      <p className="text-sm text-muted-foreground">
+                      <h3 className="font-semibold">{profile.profile_name}</h3>
+                      {/* <p className="text-sm text-muted-foreground">
                         private user since 05.11.2024
-                      </p>
+                      </p> */}
                     </div>
                   </div>
                   <Button variant="outline" size="sm">
                     Follow
                   </Button>
                 </div>
+                )
+                }
 
                 <Button className="w-full bg-[#4CAF50] hover:bg-[#45a049]">
                   Message Richard

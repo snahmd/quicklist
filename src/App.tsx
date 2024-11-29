@@ -13,6 +13,7 @@ import Profile from "./pages/Profile";
 import AddArticle from "./pages/AddArticle";
 import ProtectedRoute from "./router/ProtectedRoute";
 import Search from "./pages/Search";
+import ArticleProfile from "./pages/ArticleProfile"
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
       {
         path: "/article-detail/:title/:id",
         element: <ArticleDetail />,
+      },
+      {
+        path: "/article-profile/",
+        element: <ArticleProfile />,
       },
       {
         path: "/categories",
