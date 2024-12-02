@@ -29,7 +29,7 @@ const router = createBrowserRouter([
         element: <ArticleDetail />,
       },
       {
-        path: "/article-profile/",
+        path: "/article-profile/:id",
         element: <ArticleProfile />,
       },
       {

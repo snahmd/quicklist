@@ -18,6 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { useParams } from "react-router-dom";
 import { supabase } from "@/utils/supabaseClient";
+import { useNavigate } from "react-router-dom";
 
 export default function ArticleDetail() {
   const [currentImage, setCurrentImage] = useState(0);
@@ -32,6 +33,8 @@ export default function ArticleDetail() {
   const [images, setImages] = useState<string[]>([]);
   const [profile, setProfile] = useState<any>(null);
   const [avatarUrl, setAvatarUrl] = useState<any>(null);
+
+  const navigate = useNavigate();
 
   const { title, id } = useParams();
   console.log(title, id);
@@ -121,6 +124,10 @@ export default function ArticleDetail() {
     if (currentArticle.user_id)
     getAvatarImages();
   }, [currentArticle])
+
+  const handleProfileClick = () => {
+    navigate(`/article-profile/${profile.id}`, { state: { profile } });
+  }
   
 
   return (
@@ -269,6 +276,7 @@ export default function ArticleDetail() {
                 {profile && (
                   <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-4">
+                    <button onClick={handleProfileClick} className="flex items-center gap-4">
                     <Avatar className="h-12 w-12">
                       <AvatarImage src={avatarUrl.publicUrl} />
               
@@ -280,6 +288,7 @@ export default function ArticleDetail() {
                         private user since 05.11.2024
                       </p> */}
                     </div>
+                    </button>
                   </div>
                   <Button variant="outline" size="sm">
                     Follow
