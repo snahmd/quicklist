@@ -10,10 +10,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Users, ImageIcon } from "lucide-react";
+import { Users, Maximize2 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/utils/supabaseClient";
 import { Tables } from "@/types/supabase";
+import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
+import {
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 // Types
 interface UserProfile {
@@ -146,24 +152,39 @@ const UserProfileCard: React.FC<{ user: UserProfile }> = ({ user }) => {
   );
 };
 
-const ListingCard: React.FC<{ listing: Tables<"articles"> }> = ({ listing }) => {
+type ArticleWithImage = Tables<"articles"> & { images: string[] };
+
+const ListingCard: React.FC<{ listing: ArticleWithImage, setSelectedProduct : (data: ArticleWithImage)=>void }> = ({ listing, setSelectedProduct }) => {
   
 
   return (
     <Card>
       <CardContent className="p-0">
         <div className="flex flex-col sm:flex-row">
-          <div className="relative w-full sm:w-40 h-40">
-            <img
-              src="bckjdb"
-              alt={listing.title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-1 rounded-md text-xs flex items-center">
-              <ImageIcon className="w-3 h-3 mr-1" />
-              {/* <span>{listing.imageCount}</span> */}
-            </div>
-          </div>
+          {/* Product Image */}
+          <div
+                    className="relative w-full sm:w-48 h-48 cursor-pointer"
+                    onClick={() => setSelectedProduct(listing)}
+                  >
+                    {listing.images && listing.images.length > 0 ? (
+                      <img
+                        src={listing.images[0]}
+                        alt={listing.title}
+                        className="object-cover  w-full h-full"
+                      />
+                    ) : (
+                      <img
+                        src="https://placehold.co/400x400"
+                        alt={listing.title}
+                        className="object-cover  w-full h-full"
+                      />
+                    )}
+
+                    <div className="absolute top-2 right-2 bg-black/50 rounded-full p-1">
+                      <Maximize2 className="h-4 w-4 text-white" />
+                    </div>
+                  </div>
+
           <div className="p-4 flex-1">
             <div className="flex items-center text-sm text-muted-foreground mb-2">
               {/* <MapPin className="w-4 h-4 mr-1" />
@@ -187,7 +208,10 @@ const ListingCard: React.FC<{ listing: Tables<"articles"> }> = ({ listing }) => 
 const App: React.FC = () => {
   const [sortBy, setSortBy] = useState<string>("newest");
 
-  const [sortedListings, setSortedListings] = useState<Tables<"articles">[]>([]);
+  const [sortedListings, setSortedListings] = useState<ArticleWithImage[]>([]);
+
+  const [selectedProduct, setSelectedProduct] = useState<ArticleWithImage | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   let sortedListing = [...sortedListings].sort((a, b) => {
     if (sortBy === "newest") {
@@ -213,12 +237,62 @@ const App: React.FC = () => {
     }
     console.log(data);
     // setProfileArticles(data);
-    setSortedListings(data);
+    // setSortedListings(data);
+
+    const articlesWithImages = await Promise.all(
+      data.map(async (article: Tables<"articles">) => {
+        const { data: files, error } = await supabase.storage
+          .from("article_images")
+          .list(article.id);
+
+        if (error) {
+          console.error(
+            `Error fetching images for article ${article.id}`,
+            error
+          );
+          return { ...article, images: [] };
+        }
+
+        // Resimlerin public URL'lerini al
+        const images = files.map((file) => {
+          const { data } = supabase.storage
+            .from("article_images")
+            .getPublicUrl(`${article.id}/${file.name}`);
+          return data.publicUrl;
+        });
+
+        return { ...article, images };
+      })
+    );
+    setSortedListings(articlesWithImages);
   }
+
+
 
   useEffect(() => {
     fetchProfileArticles();
   }, [profile])
+
+  const nextImage = () => {
+    if (selectedProduct) {
+      setCurrentImageIndex(
+        (prevIndex) => (prevIndex + 1) % selectedProduct.images.length
+      );
+    }
+  };
+
+  const prevImage = () => {
+    if (selectedProduct) {
+      setCurrentImageIndex(
+        (prevIndex) =>
+          (prevIndex - 1 + selectedProduct.images.length) %
+          selectedProduct.images.length
+      );
+    }
+  };
+
+  
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -241,12 +315,68 @@ const App: React.FC = () => {
             </div>
             <div className="space-y-4">
               {sortedListing?.map((listing) => (
-                <ListingCard key={listing.id} listing={listing} />
+                <ListingCard key={listing.id} listing={listing} setSelectedProduct={setSelectedProduct} />
               ))}
             </div>
           </div>
         </div>
       </div>
+      {/* Image Modal */}
+      <Dialog
+        open={selectedProduct !== null}
+        onOpenChange={() => {
+          setSelectedProduct(null);
+          setCurrentImageIndex(0);
+        }}
+      >
+        <DialogContent className="max-w-3xl p-0 overflow-hidden">
+          <div className="relative aspect-square">
+            {selectedProduct && selectedProduct.images.length > 0 ? (
+              <img
+                src={selectedProduct.images[currentImageIndex]}
+                alt={selectedProduct.title}
+                className="object-cover w-full h-full"
+              />
+            ) : (
+              <img
+                src="https://placehold.co/400x400"
+                alt={selectedProduct?.title}
+                className="object-cover w-full h-full"
+              />
+            )}
+            <DialogClose className="absolute top-2 right-2 bg-white rounded-full p-2">
+              <X className="h-4 w-4" />
+            </DialogClose>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-1/2 left-2 -translate-y-1/2 bg-white/80 hover:bg-white"
+              onClick={prevImage}
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-1/2 right-2 -translate-y-1/2 bg-white/80 hover:bg-white"
+              onClick={nextImage}
+            >
+              <ChevronRight className="h-6 w-6" />
+            </Button>
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+              {selectedProduct?.images.map((_, index) => (
+                <button
+                  key={index}
+                  className={`w-2 h-2 rounded-full ${
+                    currentImageIndex === index ? "bg-white" : "bg-white/50"
+                  }`}
+                  onClick={() => setCurrentImageIndex(index)}
+                />
+              ))}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
