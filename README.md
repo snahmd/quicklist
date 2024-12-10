@@ -21,4 +21,4 @@ Quicklist is a fast and efficient listing application that allows users to post 
 
 ## Live Demo
 
-Check out the live demo: [QuickList on Vercel](https://q-list.vercel.app)
+Check out the live demo: [QuickList](https://quick-list.com)
