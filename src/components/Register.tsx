@@ -25,14 +25,16 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const { setUser } = useUserContext();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Handle login logic here
-
+    setLoading(false);
     const result = await supabase.auth.signUp({ email, password });
+    setLoading(true);
     if (result.error) {
       alert(result.error.message);
     } else {
@@ -168,6 +170,7 @@ export default function Register() {
               <Button
                 type="submit"
                 className="w-full bg-[#9CCB3B] hover:bg-[#8BB82D]"
+                disabled={loading}
               >
                 Register for free
               </Button>

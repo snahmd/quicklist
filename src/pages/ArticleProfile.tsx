@@ -20,6 +20,8 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { useUserContext } from "@/context/userContext";
+
 
 // Types
 interface UserProfile {
@@ -99,10 +101,14 @@ const mockUser: UserProfile = {
 
 
 // Components
-const UserProfileCard: React.FC<{ user: UserProfile }> = ({ user }) => {
+const UserProfileCard = () =>{
+  const { user } = useUserContext();
   const location = useLocation();
   const currentProfile = location.state.profile
   const [avatarUrl, setAvatarUrl] = useState<any>(null);
+  const [followers, setFollowers] = useState<Tables<"followers">[]>([]);
+  
+
   const getAvatarImages = async () => {
      if (!currentProfile) return;
     const {data} = await supabase.storage.from("images").getPublicUrl(`${currentProfile?.id}/avatar.png`);
@@ -116,6 +122,28 @@ const UserProfileCard: React.FC<{ user: UserProfile }> = ({ user }) => {
     if (currentProfile.id)
     getAvatarImages();
   }, [currentProfile])
+
+  const getFollowers = async () => {
+    const { data, error } = await supabase
+      .from("followers")
+      .select("*")
+      .eq("follow", "c00bc276-ac9c-4c20-8a36-5a988224e7a9");
+    if (error) {
+      console.error(error);
+      return;
+    }
+    console.log(data);
+    console.log(currentProfile.id)
+    setFollowers(data);
+  }
+
+  useEffect(() => {
+    if (currentProfile && currentProfile.id)
+    getFollowers();
+  }, [currentProfile])
+
+  
+
 
   return (
     <Card className="w-full">
@@ -142,10 +170,20 @@ const UserProfileCard: React.FC<{ user: UserProfile }> = ({ user }) => {
             </p> */}
             <p className="flex items-center">
               <Users className="mr-2 h-4 w-4" />
-              {user.followers} Follower
+              {followers.length} Follower
             </p>
           </div>
-          <Button className="w-full">Folgen</Button>
+          {/* // follower -> user_id, follow
+          // follow herhangi birisi user.id ?
+          // eger boyleyse button diabled yapilcak
+          // kendini takip edemesin. nasil? bu sayfadaki id(currentProfile.id) ile user.id ayni mi? */}
+          {
+            user && (
+              user.id === currentProfile.id ? null : ( followers.find(follower => follower.user_id === user.id) ?
+                <Button className="w-full" disabled={true}>Allready Follow</Button> : <Button className="w-full">Follow</Button>
+              )
+            )
+          }
         </div>
       </CardContent>
     </Card>
