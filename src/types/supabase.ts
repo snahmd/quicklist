@@ -1,6 +1,5 @@
-// npx supabase login
+// npx login
 // npx supabase gen types typescript --project-id "porhsqsnfjvczyzmrjxc" --schema public > src/types/supabase.ts
-
 export type Json =
   | string
   | number
@@ -105,6 +104,42 @@ export type Database = {
         }
         Relationships: []
       }
+      chats: {
+        Row: {
+          article_id: string
+          created_at: string
+          id: string
+          sender_id: string
+        }
+        Insert: {
+          article_id?: string
+          created_at?: string
+          id?: string
+          sender_id?: string
+        }
+        Update: {
+          article_id?: string
+          created_at?: string
+          id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chats_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chats_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       followers: {
         Row: {
           created_at: string
@@ -143,32 +178,42 @@ export type Database = {
       }
       messages: {
         Row: {
-          article_id: string
+          chat_id: string
           created_at: string
           id: string
+          message: string
           read: boolean
-          title: string
+          user_id: string
         }
         Insert: {
-          article_id: string
+          chat_id?: string
           created_at?: string
           id?: string
-          read?: boolean
-          title: string
+          message: string
+          read: boolean
+          user_id?: string
         }
         Update: {
-          article_id?: string
+          chat_id?: string
           created_at?: string
           id?: string
+          message?: string
           read?: boolean
-          title?: string
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "messages_article_id_fkey"
-            columns: ["article_id"]
+            foreignKeyName: "messages_chat_id_fkey"
+            columns: ["chat_id"]
             isOneToOne: false
-            referencedRelation: "articles"
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

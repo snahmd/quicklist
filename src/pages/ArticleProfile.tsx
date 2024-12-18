@@ -127,7 +127,7 @@ const UserProfileCard = () =>{
     const { data, error } = await supabase
       .from("followers")
       .select("*")
-      .eq("follow", "c00bc276-ac9c-4c20-8a36-5a988224e7a9");
+      .eq("follow", currentProfile.id);
     if (error) {
       console.error(error);
       return;
@@ -337,7 +337,7 @@ const App: React.FC = () => {
       <div className="container mx-auto py-8 px-4">
         <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8">
           <div>
-            <UserProfileCard user={mockUser} />
+            <UserProfileCard />
           </div>
           <div>
             <div className="flex justify-end mb-4">

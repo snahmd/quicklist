@@ -3,7 +3,7 @@ import Home from "./pages/Home";
 import Layout from "./components/Layout";
 import Login from "./components/Login";
 import ArticleDetail from "./pages/ArticleDetail";
-import Messages from "./pages/Messages";
+import OldMessages from "./pages/OldMessages";
 import Categories from "./pages/Categories";
 import CategoryDetail from "./pages/CategoryDetail";
 import Register from "./components/Register";
@@ -48,7 +48,7 @@ const router = createBrowserRouter([
         path: "/messages",
         element: (
           <ProtectedRoute>
-            <Messages />
+            <OldMessages />
           </ProtectedRoute>
         ),
       },
